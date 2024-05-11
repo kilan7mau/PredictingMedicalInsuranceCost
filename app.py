@@ -19,12 +19,14 @@ def load_data():
 #@st.cache(allow_output_mutation=True)
 @st.cache_resource
 def load_model_RF():
-    with open('D:\jetbrain\ideProject\PyProject\DACN1\RF_model.pkl', 'rb') as f:
-        return pickle.load(f)
+    with open('D:\jetbrain\ideProject\PyProject\DACN1\RF_model.pkl', 'rb') as f1:
+        return pickle.load(f1)
 def load_model_GBM():
-    with open('D:\jetbrain\ideProject\PyProject\DACN1\GBM_model.pkl', 'rb') as f:
-        return pickle.load(f)
-
+    with open('D:\jetbrain\ideProject\PyProject\DACN1\GBM_model.pkl', 'rb') as f2:
+        return pickle.load(f2)
+def load_model_LR():
+    with open('D:\jetbrain\ideProject\PyProject\DACN1\LR_model.pkl', 'rb') as f3:
+        return pickle.load(f3)
 # Make prediction
 def predict(model, data):
     return model.predict(data)
@@ -73,6 +75,7 @@ def main():
         # Load model
         model_RF = load_model_RF()
         model_GBM = load_model_GBM()
+        model_LR = load_model_LR()
         
         
 
@@ -100,11 +103,15 @@ def main():
         # Make prediction
         prediction = predict(model_RF, [[Age, Diabetes, BP, Transplants, ChronicDiseases, BMI, KnownAllergies, HistoryOfCancerInFamily, NumberOfMajorSurgeries]])
         
-        st.success(f"Hey! By RF model Your health insurance premium price is Rs. {prediction[0]:.2f}")
+        st.success(f"Hey! By RF model Your health insurance premium price is Rs. {prediction[0]:.5f}")
         
         prediction = predict(model_GBM, [[Age, Diabetes, BP, Transplants, ChronicDiseases, BMI, KnownAllergies, HistoryOfCancerInFamily, NumberOfMajorSurgeries]])
         
-        st.success(f"Hey! By GBM model Your health insurance premium price is Rs. {prediction[0]:.2f}")
+        st.success(f"Hey! By GBM model Your health insurance premium price is Rs. {prediction[0]:.5f}")
+        
+        prediction = predict(model_LR, [[Age, Diabetes, BP, Transplants, ChronicDiseases, BMI, KnownAllergies, HistoryOfCancerInFamily, NumberOfMajorSurgeries]])
+        
+        st.success(f"Hey! By LR model Your health insurance premium price is Rs. {prediction[0]:.5f}")
 
 
 
