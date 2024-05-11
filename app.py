@@ -1,7 +1,7 @@
 import pickle
 import streamlit as st
 import pandas as pd
-
+import seaborn as sns
 
 # Load scikit-learn libraries
 from sklearn.ensemble import RandomForestClassifier
@@ -9,7 +9,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 # Load the data
 @st.cache_data
@@ -171,7 +170,21 @@ def main():
         # loi khong hien thi labdel 
         #st.write(df.groupby(['PremiumLabel', 'NumberOfMajorSurgeries'])['NumberOfMajorSurgeries'].count())
 
-        plot = sns.barplot(data=df, x="Diabetes", y="PremiumPrice").set_title('Insurance Premium Price for Diabetic vs Non-Diabetic Patients')
-        st.pyplot(plot)
+        fig5, ax = plt.subplots()
+        sns.barplot(data=df, x="Diabetes", y="PremiumPrice", ax=ax)
+        plt.title('Insurance Premium Price for Diabetic vs Non-Diabetic Patients')
+        st.pyplot(fig5)
+
+        plt.figure(figsize=(10, 6))
+        sns.displot(df, x="PremiumPrice", hue="Diabetes", kind="kde", fill=True)
+        plt.title('Density plot for Diabetic vs Non-Diabetic Patients', fontsize=12, fontweight='bold')
+        st.pyplot(plt.gcf())
+
+        fig6, ax = plt.subplots()
+        sns.barplot(data=df, x="AnyTransplants", y="PremiumPrice", ax=ax)
+        plt.title('Insurance Premium Price for Patients with/without Any Transplants')
+        st.pyplot(fig6)
+        
+        #lam toi cell 236
 if __name__ == '__main__':
     main()
