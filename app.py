@@ -1,4 +1,6 @@
 import pickle
+
+import streamlit
 import streamlit as st
 import pandas as pd
 import seaborn as sns
@@ -21,12 +23,13 @@ def load_data():
 def load_model_RF():
     with open('D:\jetbrain\ideProject\PyProject\DACN1\RF_model.pkl', 'rb') as f1:
         return pickle.load(f1)
+
+# Make predictio
+@st.cache_resource
 def load_model_GBM():
     with open('D:\jetbrain\ideProject\PyProject\DACN1\GBM_model.pkl', 'rb') as f2:
         return pickle.load(f2)
-def load_model_LR():
-    with open('D:\jetbrain\ideProject\PyProject\DACN1\LR_model.pkl', 'rb') as f3:
-        return pickle.load(f3)
+
 # Make prediction
 def predict(model, data):
     return model.predict(data)
@@ -75,14 +78,13 @@ def main():
         # Load model
         model_RF = load_model_RF()
         model_GBM = load_model_GBM()
-        model_LR = load_model_LR()
-        
         
 
+        
         # Collect user inputs
-        Age = st.number_input("Age", min_value=1, max_value=100)
-        Height = st.slider('Height(cm)', 10, 200)
-        Weight = st.slider('Weight(kg)', 10, 150)
+        Age = st.number_input("Age", min_value=18, max_value=70)
+        Height = st.slider('Height(cm)', 140, 200)
+        Weight = st.slider('Weight(kg)', 50, 140)
         Diabetes = st.checkbox('Diabetes')
         BP = st.checkbox('Blood pressure')
         Transplants = st.checkbox('Transplants')
@@ -101,17 +103,19 @@ def main():
         BMI = Weight / ((Height / 100) ** 2)
 
         # Make prediction
-        prediction = predict(model_RF, [[Age, Diabetes, BP, Transplants, ChronicDiseases, BMI, KnownAllergies, HistoryOfCancerInFamily, NumberOfMajorSurgeries]])
+        prediction1 = predict(model_RF, [[Age, Diabetes, BP, Transplants, ChronicDiseases, BMI, KnownAllergies, HistoryOfCancerInFamily, NumberOfMajorSurgeries]])
         
-        st.success(f"Hey! By RF model Your health insurance premium price is Rs. {prediction[0]:.5f}")
+        st.success(f"Hey! By RF model Your health insurance premium price is Rs. {prediction1[0]:.5f}")
         
-        prediction = predict(model_GBM, [[Age, Diabetes, BP, Transplants, ChronicDiseases, BMI, KnownAllergies, HistoryOfCancerInFamily, NumberOfMajorSurgeries]])
+        prediction2 = predict(model_GBM, [[Age, Diabetes, BP, Transplants, ChronicDiseases, BMI, KnownAllergies, HistoryOfCancerInFamily, NumberOfMajorSurgeries]])
         
-        st.success(f"Hey! By GBM model Your health insurance premium price is Rs. {prediction[0]:.5f}")
-        
-        prediction = predict(model_LR, [[Age, Diabetes, BP, Transplants, ChronicDiseases, BMI, KnownAllergies, HistoryOfCancerInFamily, NumberOfMajorSurgeries]])
-        
-        st.success(f"Hey! By LR model Your health insurance premium price is Rs. {prediction[0]:.5f}")
+        st.success(f"Hey! By GBM model Your health insurance premium price is Rs. {prediction2[0]:.5f}")
+
+        if model_RF == model_GBM:
+            print("The pickle files are identical")
+        else:
+            print("The pickle files are different")
+
 
 
 
@@ -142,8 +146,7 @@ def main():
         st.subheader("Feature Importance")
         st.bar_chart(feat_imp.nlargest(10))
 
-        pr_lab = ['Low', 'Basic', 'Average', 'High', 'SuperHigh']
-        df['PremiumLabel'] = pd.cut(df['PremiumPrice'], bins=5, labels=pr_lab, precision=0)
+        
         
 
         # Confusion Matrix
@@ -170,12 +173,9 @@ def main():
         sns.lineplot(x=df.Age, y=df.PremiumPrice).set_title('Insurance Premium Price by Age')
         st.pyplot(fig3)
 
-        fig4, ax = plt.subplots(figsize=(12, 6))
-        sns.countplot(x='PremiumLabel', data=df, ax=ax).set_title('Distribution of the Insurance Premium Price')
-        st.pyplot(fig4)
+        
 
-        # loi khong hien thi labdel 
-        #st.write(df.groupby(['PremiumLabel', 'NumberOfMajorSurgeries'])['NumberOfMajorSurgeries'].count())
+        
 
         fig5, ax = plt.subplots()
         sns.barplot(data=df, x="Diabetes", y="PremiumPrice", ax=ax)

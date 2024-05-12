@@ -7,6 +7,8 @@ with open('GBM_model.pkl', 'rb') as f:
 # Load the second pickle file
 with open('RF_model.pkl', 'rb') as f:
     obj2 = pickle.load(f)
+    
+
 
 # Compare the two objects
 if obj1 == obj2:
