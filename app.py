@@ -23,9 +23,6 @@ def load_data():
 def load_model_RF():
     with open('D:\jetbrain\ideProject\PyProject\DACN1\RF_model.pkl', 'rb') as f1:
         return pickle.load(f1)
-
-# Make predictio
-@st.cache_resource
 def load_model_GBM():
     with open('D:\jetbrain\ideProject\PyProject\DACN1\GBM_model.pkl', 'rb') as f2:
         return pickle.load(f2)
@@ -83,32 +80,38 @@ def main():
         
         # Collect user inputs
         Age = st.number_input("Age", min_value=18, max_value=70)
-        Height = st.slider('Height(cm)', 140, 200)
-        Weight = st.slider('Weight(kg)', 50, 140)
-        Diabetes = st.checkbox('Diabetes')
-        BloodPressureProblems = st.checkbox('Blood Pressure Problems')
-        Transplants = st.checkbox('Transplants')
-        ChronicDiseases = st.checkbox('Chronic Diseases')
-        KnownAllergies = st.checkbox('Known Allergies')
-        HistoryOfCancerInFamily = st.checkbox('History Of Cancer In Family')
+        Height = st.slider("Height(cm)", 140, 200)
+        Weight = st.slider("Weight(kg)", 50, 140)
         NumberOfMajorSurgeries = st.number_input("Number Of Major Surgeries", min_value=0, max_value=10)
+        AnyChronicDiseases = st.checkbox('Any Chronic Diseases')
+        HistoryOfCancerInFamily = st.checkbox('History Of Cancer In Family')
+        AnyTransplants = st.checkbox('Any Transplants')
+        BloodPressureProblems = st.checkbox('Blood Pressure Problems')
+        Diabetes = st.checkbox('Diabetes')
+        KnownAllergies = st.checkbox('Known Allergies')
+        
+        
 
         # Convert checkbox values to binary
         Diabetes = 1 if Diabetes else 0
         BloodPressureProblems = 1 if BloodPressureProblems else 0
-        Transplants = 1 if Transplants else 0
-        ChronicDiseases = 1 if ChronicDiseases else 0
+        AnyTransplants = 1 if AnyTransplants else 0
+        AnyChronicDiseases = 1 if AnyChronicDiseases else 0
         KnownAllergies = 1 if KnownAllergies else 0
         HistoryOfCancerInFamily = 1 if HistoryOfCancerInFamily else 0
         BMI = Weight / ((Height / 100) ** 2)
 
         # Make prediction
-        prediction1 = predict(model_RF, [[Age, Diabetes, BloodPressureProblems, Transplants, ChronicDiseases, BMI, KnownAllergies, HistoryOfCancerInFamily, NumberOfMajorSurgeries]])
+        prediction1 = predict(model_RF, [[Age, NumberOfMajorSurgeries, AnyChronicDiseases, HistoryOfCancerInFamily, AnyTransplants, BMI, BloodPressureProblems, Diabetes, KnownAllergies]])
         st.success(f"Hey! By RF model Your health insurance premium price is Rs. {prediction1[0]:.5f}")
         
-        prediction2 = predict(model_GBM, [[Age, Diabetes, BloodPressureProblems, Transplants, ChronicDiseases, BMI, KnownAllergies, HistoryOfCancerInFamily, NumberOfMajorSurgeries]])
+        prediction2 = predict(model_GBM, [[Age, NumberOfMajorSurgeries, AnyChronicDiseases, HistoryOfCancerInFamily, AnyTransplants, BMI, BloodPressureProblems, Diabetes, KnownAllergies]])
         st.success(f"Hey! By GBM model Your health insurance premium price is Rs. {prediction2[0]:.5f}")
-
+        
+        if prediction1[0] == prediction2[0]:
+            st.success("The predictions are same")
+        else:
+            st.success("The predictions are different")
         if model_RF == model_GBM:
             print("The pickle files are identical")
         else:
