@@ -161,6 +161,28 @@ def main():
         sns.heatmap(cm_rf, annot=True, fmt="d", ax=ax)
         st.pyplot(fig)
         
+        # Distribution of the Insurance Premium Price
+        fig2, ax = plt.subplots(figsize=(20, 6))
+        sns.countplot(x='PremiumPrice', data=df, ax=ax).set_title('Distribution of the Insurance Premium Price')
+        st.pyplot(fig2)
+        #2 cái này đứng chung 1 hàng
+        #Insurance Premium Price Label
+        pr_lab = ['Low', 'Basic', 'Average', 'High', 'SuperHigh']
+        df['PremiumLabel'] = pr_bins = pd.cut(df['PremiumPrice'], bins=5, labels=pr_lab, precision=0)
+        fig3, ax = plt.subplots(figsize=(12, 6))
+        sns.countplot(x='PremiumLabel', data=df, ax=ax).set_title('Distribution of the Insurance Premium Price Label')
+        st.pyplot(fig3)
+        
+        # Insurance Premium Price for Diabetic vs Non-Diabetic Patients
+        fig4, ax = plt.subplots()
+        sns.barplot(data=df, x="Diabetes", y="PremiumPrice", ax=ax).set_title('Insurance Premium Price for Diabetic vs Non-Diabetic Patients')
+        st.pyplot(fig4)
+        
+        #Density plot for Diabetic vs Non-Diabetic Patients
+        fig5, ax = plt.subplots()
+        sns.kdeplot(data=df, x="PremiumPrice", hue="Diabetes", fill=True, ax=ax)
+        plt.title('Density plot for Diabetic vs Non-Diabetic Patients', fontsize=12, fontdict={"weight": "bold"})
+        st.pyplot(fig5)
         
 if __name__ == '__main__':
     main()
