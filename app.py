@@ -86,7 +86,7 @@ def main():
         Height = st.slider('Height(cm)', 140, 200)
         Weight = st.slider('Weight(kg)', 50, 140)
         Diabetes = st.checkbox('Diabetes')
-        BP = st.checkbox('Blood pressure')
+        BloodPressureProblems = st.checkbox('Blood Pressure Problems')
         Transplants = st.checkbox('Transplants')
         ChronicDiseases = st.checkbox('Chronic Diseases')
         KnownAllergies = st.checkbox('Known Allergies')
@@ -95,7 +95,7 @@ def main():
 
         # Convert checkbox values to binary
         Diabetes = 1 if Diabetes else 0
-        BP = 1 if BP else 0
+        BloodPressureProblems = 1 if BloodPressureProblems else 0
         Transplants = 1 if Transplants else 0
         ChronicDiseases = 1 if ChronicDiseases else 0
         KnownAllergies = 1 if KnownAllergies else 0
@@ -103,12 +103,10 @@ def main():
         BMI = Weight / ((Height / 100) ** 2)
 
         # Make prediction
-        prediction1 = predict(model_RF, [[Age, Diabetes, BP, Transplants, ChronicDiseases, BMI, KnownAllergies, HistoryOfCancerInFamily, NumberOfMajorSurgeries]])
-        
+        prediction1 = predict(model_RF, [[Age, Diabetes, BloodPressureProblems, Transplants, ChronicDiseases, BMI, KnownAllergies, HistoryOfCancerInFamily, NumberOfMajorSurgeries]])
         st.success(f"Hey! By RF model Your health insurance premium price is Rs. {prediction1[0]:.5f}")
         
-        prediction2 = predict(model_GBM, [[Age, Diabetes, BP, Transplants, ChronicDiseases, BMI, KnownAllergies, HistoryOfCancerInFamily, NumberOfMajorSurgeries]])
-        
+        prediction2 = predict(model_GBM, [[Age, Diabetes, BloodPressureProblems, Transplants, ChronicDiseases, BMI, KnownAllergies, HistoryOfCancerInFamily, NumberOfMajorSurgeries]])
         st.success(f"Hey! By GBM model Your health insurance premium price is Rs. {prediction2[0]:.5f}")
 
         if model_RF == model_GBM:
@@ -146,9 +144,6 @@ def main():
         st.subheader("Feature Importance")
         st.bar_chart(feat_imp.nlargest(10))
 
-        
-        
-
         # Confusion Matrix
         scaler = StandardScaler()
         X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size=0.3, random_state=43)
@@ -165,33 +160,7 @@ def main():
         fig, ax = plt.subplots(figsize=(10, 7))
         sns.heatmap(cm_rf, annot=True, fmt="d", ax=ax)
         st.pyplot(fig)
-        fig2 = sns.displot(x='Age', data=df, aspect=10 / 6, kde=True)
         
-        st.pyplot(fig2)
-
-        fig3, ax = plt.subplots(figsize=(12, 6))
-        sns.lineplot(x=df.Age, y=df.PremiumPrice).set_title('Insurance Premium Price by Age')
-        st.pyplot(fig3)
-
         
-
-        
-
-        fig5, ax = plt.subplots()
-        sns.barplot(data=df, x="Diabetes", y="PremiumPrice", ax=ax)
-        plt.title('Insurance Premium Price for Diabetic vs Non-Diabetic Patients')
-        st.pyplot(fig5)
-
-        plt.figure(figsize=(10, 6))
-        sns.displot(df, x="PremiumPrice", hue="Diabetes", kind="kde", fill=True)
-        plt.title('Density plot for Diabetic vs Non-Diabetic Patients', fontsize=12, fontweight='bold')
-        st.pyplot(plt.gcf())
-
-        fig6, ax = plt.subplots()
-        sns.barplot(data=df, x="AnyTransplants", y="PremiumPrice", ax=ax)
-        plt.title('Insurance Premium Price for Patients with/without Any Transplants')
-        st.pyplot(fig6)
-        
-        #lam toi cell 236
 if __name__ == '__main__':
     main()
