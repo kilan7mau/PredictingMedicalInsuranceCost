@@ -12,24 +12,30 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 
+
 # Load the data
 @st.cache_data
 def load_data():
     return pd.read_csv('Medicalpremium.csv')
 
+
 # Load the model
-#@st.cache(allow_output_mutation=True)
+# @st.cache(allow_output_mutation=True)
 @st.cache_resource
 def load_model_RF():
     with open('D:\jetbrain\ideProject\PyProject\DACN1\RF_model.pkl', 'rb') as f1:
         return pickle.load(f1)
+
+
 def load_model_GBM():
     with open('D:\jetbrain\ideProject\PyProject\DACN1\GBM_model.pkl', 'rb') as f2:
         return pickle.load(f2)
 
+
 # Make prediction
 def predict(model, data):
     return model.predict(data)
+
 
 def main():
     st.set_page_config(layout="wide")
@@ -68,16 +74,13 @@ def main():
         st.subheader("Enter your information")
 
         # Load data
-        
+
         df = load_data()
-        
 
         # Load model
         model_RF = load_model_RF()
         model_GBM = load_model_GBM()
-        
 
-        
         # Collect user inputs
         Age = st.number_input("Age", min_value=18, max_value=70)
         Height = st.slider("Height(cm)", 140, 200)
@@ -89,8 +92,6 @@ def main():
         BloodPressureProblems = st.checkbox('Blood Pressure Problems')
         Diabetes = st.checkbox('Diabetes')
         KnownAllergies = st.checkbox('Known Allergies')
-        
-        
 
         # Convert checkbox values to binary
         Diabetes = 1 if Diabetes else 0
@@ -102,12 +103,16 @@ def main():
         BMI = Weight / ((Height / 100) ** 2)
 
         # Make prediction
-        prediction1 = predict(model_RF, [[Age, NumberOfMajorSurgeries, AnyChronicDiseases, HistoryOfCancerInFamily, AnyTransplants, BMI, BloodPressureProblems, Diabetes, KnownAllergies]])
+        prediction1 = predict(model_RF, [
+            [Age, NumberOfMajorSurgeries, AnyChronicDiseases, HistoryOfCancerInFamily, AnyTransplants, BMI,
+             BloodPressureProblems, Diabetes, KnownAllergies]])
         st.success(f"Hey! By RF model Your health insurance premium price is Rs. {prediction1[0]:.5f}")
-        
-        prediction2 = predict(model_GBM, [[Age, NumberOfMajorSurgeries, AnyChronicDiseases, HistoryOfCancerInFamily, AnyTransplants, BMI, BloodPressureProblems, Diabetes, KnownAllergies]])
+
+        prediction2 = predict(model_GBM, [
+            [Age, NumberOfMajorSurgeries, AnyChronicDiseases, HistoryOfCancerInFamily, AnyTransplants, BMI,
+             BloodPressureProblems, Diabetes, KnownAllergies]])
         st.success(f"Hey! By GBM model Your health insurance premium price is Rs. {prediction2[0]:.5f}")
-        
+
         if prediction1[0] == prediction2[0]:
             st.success("The predictions are same")
         else:
@@ -135,7 +140,7 @@ def main():
         st.subheader("DataFrame")
         df = load_data()
         st.write(df)
-        
+
         st.write(df.describe().T)
 
         # Feature Importance
@@ -163,29 +168,31 @@ def main():
         fig, ax = plt.subplots(figsize=(10, 7))
         sns.heatmap(cm_rf, annot=True, fmt="d", ax=ax)
         st.pyplot(fig)
-        
+
         # Distribution of the Insurance Premium Price
         fig2, ax = plt.subplots(figsize=(20, 6))
         sns.countplot(x='PremiumPrice', data=df, ax=ax).set_title('Distribution of the Insurance Premium Price')
         st.pyplot(fig2)
-        #2 cái này đứng chung 1 hàng
-        #Insurance Premium Price Label
+        # 2 cái này đứng chung 1 hàng
+        # Insurance Premium Price Label
         pr_lab = ['Low', 'Basic', 'Average', 'High', 'SuperHigh']
         df['PremiumLabel'] = pr_bins = pd.cut(df['PremiumPrice'], bins=5, labels=pr_lab, precision=0)
         fig3, ax = plt.subplots(figsize=(12, 6))
         sns.countplot(x='PremiumLabel', data=df, ax=ax).set_title('Distribution of the Insurance Premium Price Label')
         st.pyplot(fig3)
-        
+
         # Insurance Premium Price for Diabetic vs Non-Diabetic Patients
         fig4, ax = plt.subplots()
-        sns.barplot(data=df, x="Diabetes", y="PremiumPrice", ax=ax).set_title('Insurance Premium Price for Diabetic vs Non-Diabetic Patients')
+        sns.barplot(data=df, x="Diabetes", y="PremiumPrice", ax=ax).set_title(
+            'Insurance Premium Price for Diabetic vs Non-Diabetic Patients')
         st.pyplot(fig4)
-        
-        #Density plot for Diabetic vs Non-Diabetic Patients
+
+        # Density plot for Diabetic vs Non-Diabetic Patients
         fig5, ax = plt.subplots()
         sns.kdeplot(data=df, x="PremiumPrice", hue="Diabetes", fill=True, ax=ax)
         plt.title('Density plot for Diabetic vs Non-Diabetic Patients', fontsize=12, fontdict={"weight": "bold"})
         st.pyplot(fig5)
-        
+
+
 if __name__ == '__main__':
     main()
